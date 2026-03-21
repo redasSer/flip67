@@ -1,0 +1,17 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: flip67-postgres
+    environment:
+      POSTGRES_DB: flip67
+      POSTGRES_USER: flip67
+      POSTGRES_PASSWORD: flip67
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+

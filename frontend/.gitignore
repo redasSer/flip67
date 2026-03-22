@@ -1,0 +1,71 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# IDE
+.idea/*
+*.iml
+!.idea/modules.xml
+!.idea/Sledgehammer-js-monorepo.iml
+!.idea/prettier.xml
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+.cspell/*
+
+# dependencies
+**/node_modules
+/.pnp
+.pnp.js
+
+# build
+.gradle
+.frontend-gradle-plugin
+.docusaurus
+
+# testing
+**/coverage
+**/coverage-native-syntax
+test-report.xml
+**/.swc
+
+# production
+**/build
+!apps/active-disclosure-ui/scripts/build
+!apps/active-disclosure-ui/authoring-mfe/scripts/build
+apps/content-processor/db-migration/out
+**/dist
+**/lib
+**/out-tsc
+.parcel-cache
+
+# monorepo tooling
+.nx/cache
+.nx/workspace-data
+**/.nx/cache
+**/.nx/workspace-data
+
+# misc
+.DS_Store
+.env.local
+.env*.local
+**/*.tsbuildinfo
+newrelic_agent.log
+**/.gradle
+version.js
+.ai/
+
+# package manager
+**/package-lock.json
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+**/.yarn/*
+.yarnrc
+.yarn/releases/*
+!.yarn/patches
+!.yarn/plugins
+.yarn-modern/*
+
+# Diagnostic reports (https://nodejs.org/api/report.html)
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+/.run/
+/apps/content-processor/db-migration/out/

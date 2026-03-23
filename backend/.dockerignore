@@ -1,0 +1,25 @@
+.gradle/
+.idea/
+.vscode/
+build/
+out/
+*.iml
+*.iws
+*.ipr
+
+# Secrets
+.env
+
+# Git
+.git/
+.gitignore
+
+# Docs
+HELP.md
+README.md
+*.md
+
+# OS
+.DS_Store
+Thumbs.db
+

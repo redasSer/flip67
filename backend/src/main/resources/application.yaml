@@ -3,10 +3,15 @@ spring:
     name: flip67
 
   datasource:
-    url: jdbc:postgresql://localhost:5433/flip67
-    username: flip67
-    password: flip67
+    url: ${DB_URL:jdbc:postgresql://localhost:5433/flip67}
+    username: ${DB_USERNAME:flip67}
+    password: ${DB_PASSWORD:flip67}
     driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: ${DB_POOL_SIZE:10}
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
 
   flyway:
     enabled: true
@@ -16,12 +21,29 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
-    show-sql: true
+    show-sql: ${JPA_SHOW_SQL:false}
+
 server:
   address: 0.0.0.0
+  port: ${SERVER_PORT:8080}
 
 mybatis:
   type-handlers-package: com.redis.flip67.config.mybatis
   type-aliases-package: com.redis.flip67.config.mybatis
   configuration:
     map-underscore-to-camel-case: true
+
+logging:
+  level:
+    root: ${LOG_LEVEL:INFO}
+    com.redis.flip67: ${APP_LOG_LEVEL:INFO}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
+

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Copy, Check } from "lucide-react";
 import { Button } from "@/components/retroui/Button";
 import { Loader } from "@/components/retroui/Loader";
+import { useVibration } from "@/hooks/useVibration";
 
 interface RoomCodeCardProps {
     code?: string;
@@ -9,6 +10,7 @@ interface RoomCodeCardProps {
 
 const RoomCodeCard = ({ code }: RoomCodeCardProps) => {
     const [copied, setCopied] = useState(false);
+    const { vibrate } = useVibration();
 
     const handleCopy = () => {
         if (!code) { return; }
@@ -35,6 +37,8 @@ const RoomCodeCard = ({ code }: RoomCodeCardProps) => {
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
         }
+
+        vibrate.success();
     };
 
     return (

@@ -13,6 +13,7 @@ import {
     VENGEANCE_PLAY_CARDS,
 } from "./cardConstants";
 import type { GameMode } from "@/types/api";
+import { useVibration } from "@/hooks/useVibration";
 
 interface CardDrawerProps {
     onApplyScore: (points: number) => void;
@@ -32,6 +33,7 @@ const CardDrawer = ({ onApplyScore, mode = "CLASSIC" }: CardDrawerProps) => {
         () => new Array(EFFECT_CARDS.length).fill(false)
     );
     const { mutate: scorePoints, isPending } = useScorePoints();
+    const { vibrate } = useVibration()
 
     const resetSelections = () => {
         setSelectedPlayCards(new Array(PLAY_CARDS.length).fill(false));
@@ -39,6 +41,7 @@ const CardDrawer = ({ onApplyScore, mode = "CLASSIC" }: CardDrawerProps) => {
     };
 
     const togglePlayCard = (index: number) => {
+        vibrate.selection();
         setSelectedPlayCards((prev) => {
             const next = [...prev];
             if (isVengeance && index === 13 && next[13]) {
@@ -50,6 +53,7 @@ const CardDrawer = ({ onApplyScore, mode = "CLASSIC" }: CardDrawerProps) => {
     };
 
     const toggleEffectCard = (index: number) => {
+        vibrate.selection();
         setSelectedEffectCards((prev) => {
             const next = [...prev];
             next[index] = !next[index];
@@ -98,6 +102,7 @@ const CardDrawer = ({ onApplyScore, mode = "CLASSIC" }: CardDrawerProps) => {
     })();
 
     const handleApply = () => {
+        vibrate.success();
         scorePoints(total, {
             onSuccess: () => {
                 onApplyScore(total);

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Check, Minus, Plus, X } from "lucide-react";
 import { motion } from "framer-motion";
+import { useVibration } from "@/hooks/useVibration";
 
 interface ScoreEditorProps {
     currentScore: number;
@@ -15,6 +16,7 @@ const ScoreEditor = ({ currentScore, isPending, allowNegative = false, onConfirm
     // Keep a raw string so the user can type "-" before digits
     const [raw, setRaw] = useState(String(currentScore));
     const inputRef = useRef<HTMLInputElement>(null);
+    const { vibrate } = useVibration();
 
     useEffect(() => {
         // Slight delay so the animation can start before we focus
@@ -48,7 +50,7 @@ const ScoreEditor = ({ currentScore, isPending, allowNegative = false, onConfirm
         >
             {/* Stepper − */}
             <button
-                onClick={() => { const next = clamp(value - 1); setValue(next); setRaw(String(next)); }}
+                onClick={() => { const next = clamp(value - 1); setValue(next); setRaw(String(next)); vibrate.rigid(); }}
                 disabled={isPending}
                 className="h-9 w-9 shrink-0 border-2 border-black bg-white shadow-[2px_2px_0_0_#000] font-head text-lg font-black flex items-center justify-center active:shadow-none active:translate-x-px active:translate-y-px transition-all disabled:opacity-40"
             >
@@ -70,7 +72,7 @@ const ScoreEditor = ({ currentScore, isPending, allowNegative = false, onConfirm
 
             {/* Stepper + */}
             <button
-                onClick={() => { const next = value + 1; setValue(next); setRaw(String(next)); }}
+                onClick={() => { const next = value + 1; setValue(next); setRaw(String(next)); vibrate.rigid(); }}
                 disabled={isPending}
                 className="h-9 w-9 shrink-0 border-2 border-black bg-white shadow-[2px_2px_0_0_#000] font-head text-lg font-black flex items-center justify-center active:shadow-none active:translate-x-px active:translate-y-px transition-all disabled:opacity-40"
             >

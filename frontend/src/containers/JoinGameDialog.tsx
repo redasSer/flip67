@@ -5,6 +5,7 @@ import { Loader } from "@/components/retroui/Loader";
 import { ArrowRight } from "lucide-react";
 import PlayerSetupStep from "@/components/custom/PlayerSetupStep";
 import { checkGameExists } from "@/api/game";
+import { useVibration } from "@/hooks/useVibration";
 
 interface JoinGameDialogProps {
     children: React.ReactNode;
@@ -22,6 +23,13 @@ const JoinGameDialog = ({ children, onConfirm }: JoinGameDialogProps) => {
 
     const roomCodeReady = roomCode.trim().length > 0;
     const playerReady = name.trim().length > 0 && avatar !== null;
+
+    const { vibrate } = useVibration();
+
+    const onAvatarChange = (emoji: string) => {
+        vibrate.selection();
+        setAvatar(emoji);
+    }
 
     const handleOpenChange = (next: boolean) => {
         setOpen(next);
@@ -41,14 +49,17 @@ const JoinGameDialog = ({ children, onConfirm }: JoinGameDialogProps) => {
         const exists = await checkGameExists(roomCode.trim().toUpperCase());
         setChecking(false);
         if (!exists) {
+            vibrate.error();
             setRoomError("Room not found. Check the code and try again.");
             return;
         }
+        
         setStep("player");
     };
 
     const handleConfirm = () => {
         if (!playerReady) return;
+        vibrate.success();
         setOpen(false);
         onConfirm(roomCode.trim().toUpperCase(), name.trim(), avatar!);
     };
@@ -119,7 +130,7 @@ const JoinGameDialog = ({ children, onConfirm }: JoinGameDialogProps) => {
                             avatar={avatar}
                             accentColor="var(--color-tertiary)"
                             onNameChange={setName}
-                            onAvatarChange={setAvatar}
+                            onAvatarChange={onAvatarChange}
                         />
                         <Dialog.Footer className="border-t-4 border-black px-5 py-4">
                             <Button

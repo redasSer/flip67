@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ScoreEditor from "@/components/custom/ScoreEditor";
 import { Pencil } from "lucide-react";
+import { useVibration } from "@/hooks/useVibration";
 
 interface PlayerBarProps {
     rank: number;
@@ -16,13 +17,23 @@ interface PlayerBarProps {
 const PlayerBar = ({ rank, name, avatar, score, isSelf = false, allowNegative = false, onScoreEdit }: PlayerBarProps) => {
     const [editing, setEditing] = useState(false);
     const [pending, setPending] = useState(false);
+    const { vibrate } = useVibration();
+    const handleOpenEdit = () => {
+        vibrate.rigid();
+        setEditing(true);
+    }
 
+    const handleEditCancel = () => {
+        vibrate.rigid();
+        setEditing(false);
+    }
     const handleConfirm = async (newScore: number) => {
         if (!onScoreEdit || newScore === score) { setEditing(false); return; }
         setPending(true);
         try {
             await onScoreEdit(newScore);
         } finally {
+            await vibrate.success();
             setPending(false);
             setEditing(false);
         }
@@ -83,7 +94,7 @@ const PlayerBar = ({ rank, name, avatar, score, isSelf = false, allowNegative = 
                             </motion.span>
                             {isSelf && onScoreEdit && (
                                 <button
-                                    onClick={() => setEditing(true)}
+                                    onClick={handleOpenEdit}
                                     title="Edit score"
                                     className="h-7 w-7 border-2 border-black bg-white shadow-[2px_2px_0_0_#000] flex items-center justify-center active:shadow-none active:translate-x-px active:translate-y-px transition-all"
                                 >
@@ -112,7 +123,7 @@ const PlayerBar = ({ rank, name, avatar, score, isSelf = false, allowNegative = 
                                 isPending={pending}
                                 allowNegative={allowNegative}
                                 onConfirm={handleConfirm}
-                                onCancel={() => setEditing(false)}
+                                onCancel={handleEditCancel}
                             />
                         </div>
                     </motion.div>

@@ -7,11 +7,13 @@ import { Button } from "@/components/retroui/Button";
 import { Play } from "lucide-react";
 import useGameStore from "@/stores/gameStore";
 import { useStartGame } from "@/hooks/useGameMutations";
+import { useVibration } from "@/hooks/useVibration";
 
 const Lobby = () => {
     const session = useGameStore((s) => s.session);
     const players = useGameStore((s) => s.players);
     const { mutate: startGame, isPending } = useStartGame();
+    const { vibrate } = useVibration();
 
     const host = players.find((p) => p.host);
     const nonHostPlayers = players.filter((p) => !p.host);
@@ -19,7 +21,12 @@ const Lobby = () => {
 
     const amIHost = session?.host;
 
-    console.log(session)
+    const handleStartGame = () => {
+        if (session?.gameId) {
+            startGame(session.gameId);
+            vibrate.success();
+        }
+    };
 
     return (
         <div className="flex flex-col items-center w-full max-w-md mx-auto pt-16 overflow-hidden">
@@ -50,7 +57,7 @@ const Lobby = () => {
                             <Button
                                 size="lg"
                                 className="w-full justify-center py-5 text-xl border-4 border-black shadow-lg gap-3 bg-verify text-white"
-                                onClick={() => session?.gameId && startGame(session.gameId)}
+                                onClick={handleStartGame}
                                 disabled={isPending}
                             >
                                 <Play className="h-6 w-6 fill-current" strokeWidth={2.5} />

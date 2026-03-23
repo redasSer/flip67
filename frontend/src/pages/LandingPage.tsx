@@ -4,6 +4,7 @@ import { CirclePlus, LogIn } from "lucide-react";
 import PageTransition from "@/components/custom/PageTransition";
 import PlayerSetupDialog from "@/containers/PlayerSetupDialog";
 import JoinGameDialog from "@/containers/JoinGameDialog";
+import SettingsDialog from "@/containers/SettingsDialog";
 import { useCreateGame, useJoinGame } from "@/hooks/useGameMutations";
 import type { GameMode } from "@/types/api";
 
@@ -28,7 +29,7 @@ const LandingPage = () => {
 
     return (
         <PageTransition>
-            <div className="flex flex-col items-center justify-center px-6 py-16 gap-24 max-w-md mx-auto">
+            <div className="flex flex-col items-center justify-center px-6 py-16 gap-16 max-w-md mx-auto">
                 {/* Hero Card */}
                 <div
                     className="w-full border-4 border-black p-10 shadow-xl text-center rotate-[-3deg]"
@@ -63,6 +64,10 @@ const LandingPage = () => {
                             <LogIn className="h-8 w-8" strokeWidth={2.5} />
                         </Button>
                     </JoinGameDialog>
+                </div>
+
+                <div className="bottom-6  max-w-md">
+                    <SettingsDialog />
                 </div>
             </div>
         </PageTransition>

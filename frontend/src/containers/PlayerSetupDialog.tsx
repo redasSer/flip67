@@ -3,6 +3,7 @@ import { Dialog } from "@/components/retroui/Dialog";
 import { Button } from "@/components/retroui/Button";
 import PlayerSetupStep from "@/components/custom/PlayerSetupStep";
 import type { GameMode } from "@/types/api";
+import { useVibration } from "@/hooks/useVibration";
 
 interface PlayerSetupDialogProps {
     children: React.ReactNode;
@@ -16,11 +17,24 @@ const PlayerSetupDialog = ({ children, onConfirm, showModeSelector = false }: Pl
     const [avatar, setAvatar] = useState<string | null>(null);
     const [mode, setMode] = useState<GameMode>("CLASSIC");
 
+    const { vibrate } = useVibration();
+
+    const onAvatarChange = (emoji: string) => {
+        vibrate.selection();
+        setAvatar(emoji);
+    }
+
+    const onModeChange = (mode: GameMode) => {
+        vibrate.selection();
+        setMode(mode);
+    }
+
     const isReady = name.trim().length > 0 && avatar !== null;
 
     const handleConfirm = () => {
         if (!isReady) return;
         setOpen(false);
+        vibrate.success();
         onConfirm(name.trim(), avatar!, mode);
     };
 
@@ -41,7 +55,7 @@ const PlayerSetupDialog = ({ children, onConfirm, showModeSelector = false }: Pl
                     avatar={avatar}
                     accentColor="var(--color-secondary)"
                     onNameChange={setName}
-                    onAvatarChange={setAvatar}
+                    onAvatarChange={onAvatarChange}
                 />
 
                 {showModeSelector && (
@@ -51,7 +65,7 @@ const PlayerSetupDialog = ({ children, onConfirm, showModeSelector = false }: Pl
                             {(["CLASSIC", "VENGEANCE"] as GameMode[]).map((m) => (
                                 <button
                                     key={m}
-                                    onClick={() => setMode(m)}
+                                    onClick={() => onModeChange(m)}
                                     className={[
                                         "flex-1 py-2 font-head text-sm uppercase tracking-widest border-2 border-black transition-colors",
                                         mode === m

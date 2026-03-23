@@ -4,6 +4,7 @@ import { LogOut, RotateCcw } from "lucide-react";
 import { Text } from "../retroui/Text";
 import useGameStore from "@/stores/gameStore";
 import { useLeaveGame, useResetGame } from "@/hooks/useGameMutations";
+import { useVibration } from "@/hooks/useVibration";
 
 interface PageHeaderProps {
     roomCode?: string;
@@ -15,6 +16,7 @@ const PageHeader = (props: PageHeaderProps) => {
     const mode = useGameStore((state) => state.mode);
     const { mutate: leave, isPending: isLeavePending } = useLeaveGame();
     const { mutate: reset, isPending: isResetPending } = useResetGame();
+    const { vibrate } = useVibration();
 
     const handleLeave = () => {
         if (session) {
@@ -22,10 +24,13 @@ const PageHeader = (props: PageHeaderProps) => {
         }
     };
 
-    const resetDialog = session?.host && (
+    const resetDialog = session?.host && session?.gameStatus === "IN_PROGRESS" && (
         <Dialog>
             <Dialog.Trigger asChild>
-                <Button className="h-8 flex items-center gap-2 bg-[#FF9500] border-2 border-[#2d2f2f] px-3 py-1 font-headline font-black text-sm text-white shadow-[2px_2px_0px_0px_#2d2f2f] uppercase tracking-wide active:translate-x-[2px] active:translate-y-[2px] active:shadow-none">
+                <Button 
+                    className="h-8 flex items-center gap-2 bg-[#FF9500] border-2 border-[#2d2f2f] px-3 py-1 font-headline font-black text-sm text-white shadow-[2px_2px_0px_0px_#2d2f2f] uppercase tracking-wide active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+                    onClick={() => vibrate.warning()}
+                >
                     <RotateCcw className="h-5" />
                 </Button>
             </Dialog.Trigger>
@@ -50,7 +55,10 @@ const PageHeader = (props: PageHeaderProps) => {
     const dialog = (
         <Dialog>
             <Dialog.Trigger asChild>
-                <Button className="h-8 flex items-center gap-2 bg-[#FF3B30] border-2 border-[#2d2f2f] px-3 py-1 font-headline font-black text-sm text-white shadow-[2px_2px_0px_0px_#2d2f2f] uppercase tracking-wide active:translate-x-[2px] active:translate-y-[2px] active:shadow-none">
+                <Button 
+                    className="h-8 flex items-center gap-2 bg-[#FF3B30] border-2 border-[#2d2f2f] px-3 py-1 font-headline font-black text-sm text-white shadow-[2px_2px_0px_0px_#2d2f2f] uppercase tracking-wide active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+                    onClick={() => vibrate.warning()} 
+                >
                     <LogOut className="h-5" />
                 </Button>
             </Dialog.Trigger>

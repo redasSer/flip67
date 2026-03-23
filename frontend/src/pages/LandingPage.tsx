@@ -7,11 +7,13 @@ import JoinGameDialog from "@/containers/JoinGameDialog";
 import SettingsDialog from "@/containers/SettingsDialog";
 import { useCreateGame, useJoinGame } from "@/hooks/useGameMutations";
 import type { GameMode } from "@/types/api";
+import { useVibration } from "@/hooks/useVibration";
 
 const LandingPage = () => {
     const navigate = useNavigate();
     const createGame = useCreateGame();
     const joinGame = useJoinGame();
+    const { vibrate } = useVibration();
 
     const handleCreate = (name: string, avatar: string, mode: GameMode) => {
         createGame.mutate(
@@ -49,6 +51,7 @@ const LandingPage = () => {
                         <Button
                             size="lg"
                             className="bg-secondary w-full justify-between py-6 px-6 text-xl border-4 border-black shadow-lg"
+                            onClick={() => vibrate.selection()}
                         >
                             <span className="font-head text-2xl uppercase text-left leading-tight">Create<br />Game</span>
                             <CirclePlus className="h-8 w-8" strokeWidth={2.5} />
@@ -59,6 +62,7 @@ const LandingPage = () => {
                         <Button
                             size="lg"
                             className="bg-tertiary w-full justify-between py-6 px-6 text-xl border-4 border-black shadow-lg"
+                            onClick={() => vibrate.selection()}
                         >
                             <span className="font-head text-2xl uppercase text-left leading-tight">Join<br />Game</span>
                             <LogIn className="h-8 w-8" strokeWidth={2.5} />

@@ -33,8 +33,8 @@ const PlayerSetupDialog = ({ children, onConfirm, showModeSelector = false }: Pl
 
     const handleConfirm = () => {
         if (!isReady) return;
-        setOpen(false);
         vibrate.success();
+        setOpen(false);
         onConfirm(name.trim(), avatar!, mode);
     };
 

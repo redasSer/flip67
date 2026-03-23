@@ -3,10 +3,11 @@ import { Settings } from "lucide-react";
 import { Dialog } from "@/components/retroui/Dialog";
 import { Button } from "@/components/retroui/Button";
 import { Text } from "@/components/retroui/Text";
-import { getHapticsEnabled, setHapticsEnabled } from "@/hooks/useVibration";
+import { getHapticsEnabled, setHapticsEnabled, useVibration } from "@/hooks/useVibration";
 
 const SettingsDialog = () => {
     const [haptics, setHaptics] = useState<boolean>(getHapticsEnabled);
+    const { vibrate } = useVibration();
 
     const handleToggle = () => {
         const next = !haptics;
@@ -18,12 +19,13 @@ const SettingsDialog = () => {
         <Dialog>
             <Dialog.Trigger asChild>
                 <Button
-                    className="bg-white w-full justify-between py-2 px-4 border-2 border-black shadow-[2px_2px_0px_0px_#2d2f2f]"
+                    className="bg-white w-full gap-1 justify-between py-2 px-4 border-2 border-black shadow-[2px_2px_0px_0px_#2d2f2f]"
                     size="sm"
                     aria-label="Settings"
+                    onClick={() => vibrate.selection()}
                 >
                     <span className="font-head text-sm uppercase tracking-widest text-left">Settings</span>
-                    <Settings className="h-4 w-4 text-[#2d2f2f]" strokeWidth={2.5} />
+                    <Settings className="h-4 w-5 text-[#2d2f2f]" strokeWidth={2.5} />
                 </Button>
             </Dialog.Trigger>
             <Dialog.Content size="sm">

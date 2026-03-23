@@ -123,7 +123,11 @@ const CardDrawer = ({ onApplyScore, mode = "CLASSIC" }: CardDrawerProps) => {
         <div>
             <Drawer open={open} onOpenChange={setOpen}>
                 <Drawer.Trigger asChild>
-                    <Button size="icon" className="fixed bottom-6 right-6 z-50 h-14 w-14 justify-center text-2xl font-bold">
+                    <Button 
+                        size="icon" 
+                        className="fixed bottom-6 right-6 z-50 h-14 w-14 justify-center text-2xl font-bold"
+                        onClick={() => vibrate.rigid()}
+                    >
                         <Plus className="h-7 w-7" strokeWidth={3} />
                     </Button>
                 </Drawer.Trigger>

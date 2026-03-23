@@ -3,7 +3,7 @@ import { Button } from "@/components/retroui/Button";
 import { Drawer } from "@/components/retroui/Drawer";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, Plus } from "lucide-react";
-import { useState } from "react";
+import { useState, useCallback } from "react"; // Added useCallback
 import { useScorePoints } from "@/hooks/useGameMutations";
 import {
     CLASSIC_EFFECT_CARDS,
@@ -20,6 +20,8 @@ interface CardDrawerProps {
     mode?: GameMode;
 }
 
+const MAX_PLAY_CARDS = 7;
+
 const CardDrawer = ({ onApplyScore, mode = "CLASSIC" }: CardDrawerProps) => {
     const isVengeance = mode === "VENGEANCE";
     const PLAY_CARDS = isVengeance ? VENGEANCE_PLAY_CARDS : CLASSIC_PLAY_CARDS;
@@ -32,40 +34,54 @@ const CardDrawer = ({ onApplyScore, mode = "CLASSIC" }: CardDrawerProps) => {
     const [selectedEffectCards, setSelectedEffectCards] = useState<boolean[]>(
         () => new Array(EFFECT_CARDS.length).fill(false)
     );
+    
     const { mutate: scorePoints, isPending } = useScorePoints();
-    const { vibrate } = useVibration()
+    const { vibrate } = useVibration();
 
-    const resetSelections = () => {
+    const resetSelections = useCallback(() => {
         setSelectedPlayCards(new Array(PLAY_CARDS.length).fill(false));
         setSelectedEffectCards(new Array(EFFECT_CARDS.length).fill(false));
-    };
+    }, [PLAY_CARDS.length, EFFECT_CARDS.length]);
 
-    const togglePlayCard = (index: number) => {
-        vibrate.selection();
+    const togglePlayCard = useCallback((index: number) => {
         setSelectedPlayCards((prev) => {
+            const isCurrentlySelected = prev[index];
+            const currentCount = prev.filter(Boolean).length;
+
+            // 1. If we are trying to select a NEW card but are already at the limit, block it
+            if (!isCurrentlySelected && currentCount >= MAX_PLAY_CARDS) {
+                return prev;
+            }
+
             const next = [...prev];
-            if (isVengeance && index === 13 && next[13]) {
+            
+            // 2. Handle the Vengeance "13" logic
+            // If we are deselecting the base 13, we MUST deselect the extra 13
+            if (isVengeance && index === 13 && isCurrentlySelected) {
                 next[EXTRA_13_INDEX] = false;
             }
-            next[index] = !next[index];
+
+            next[index] = !isCurrentlySelected;
+            
+            // Trigger vibration inside the functional update or right before
+            vibrate.selection();
             return next;
         });
-    };
+    }, [isVengeance, vibrate]);
 
-    const toggleEffectCard = (index: number) => {
+    const toggleEffectCard = useCallback((index: number) => {
         vibrate.selection();
         setSelectedEffectCards((prev) => {
             const next = [...prev];
             next[index] = !next[index];
             return next;
         });
-    };
+    }, [vibrate]);
 
+    // Derived State
     const selectedPlayCount = selectedPlayCards.filter(Boolean).length;
-    const maxPlayCards = 7;
-    const allPlayCardsSelected = selectedPlayCount >= maxPlayCards;
+    const allPlayCardsSelected = selectedPlayCount >= MAX_PLAY_CARDS;
     const bonusPoints = allPlayCardsSelected ? 15 : 0;
-
     const base13Selected = isVengeance && selectedPlayCards[13];
 
     const total = (() => {
@@ -75,14 +91,12 @@ const CardDrawer = ({ onApplyScore, mode = "CLASSIC" }: CardDrawerProps) => {
         });
 
         if (isVengeance) {
-            // If 0 is selected, all 7 cards must be selected for any score
             const zeroSelected = selectedPlayCards[0];
             if (zeroSelected && selectedPlayCount < 7) return 0;
 
-            const hasDivider = selectedEffectCards.some(
-                (sel, i) => sel && EFFECT_CARDS[i].isDivider
-            );
+            const hasDivider = selectedEffectCards.some((sel, i) => sel && EFFECT_CARDS[i].isDivider);
             if (hasDivider) sum = Math.floor(sum / 2);
+            
             selectedEffectCards.forEach((selected, i) => {
                 if (selected && !EFFECT_CARDS[i].isDivider) sum -= EFFECT_CARDS[i].value;
             });
@@ -97,7 +111,6 @@ const CardDrawer = ({ onApplyScore, mode = "CLASSIC" }: CardDrawerProps) => {
             });
             sum = sum * multiplier;
         }
-
         return sum + bonusPoints;
     })();
 
@@ -112,11 +125,9 @@ const CardDrawer = ({ onApplyScore, mode = "CLASSIC" }: CardDrawerProps) => {
         });
     };
 
-    // Rows — extra-13 is excluded here; it's rendered inline in row 3
     const visiblePlayCards = PLAY_CARDS.filter((c) => !c.isExtra13);
     const firstRow = visiblePlayCards.filter((c) => c.value <= 6);
     const secondRow = visiblePlayCards.filter((c) => c.value >= 7 && c.value <= 12);
-
     const extra13Card = PLAY_CARDS[EXTRA_13_INDEX];
 
     return (
@@ -133,7 +144,7 @@ const CardDrawer = ({ onApplyScore, mode = "CLASSIC" }: CardDrawerProps) => {
                 </Drawer.Trigger>
                 <Drawer.Content>
                     <Drawer.Footer>
-                        {/* Row 1: 0–6 */}
+                        {/* Row 1 */}
                         <div className="flex justify-center gap-1 mb-1">
                             {firstRow.map((card) => {
                                 const idx = PLAY_CARDS.indexOf(card);
@@ -142,6 +153,7 @@ const CardDrawer = ({ onApplyScore, mode = "CLASSIC" }: CardDrawerProps) => {
                                         color={card.color}
                                         key={idx}
                                         selected={selectedPlayCards[idx]}
+                                        // Visual feedback only; the function now handles the hard logic
                                         disabled={allPlayCardsSelected && !selectedPlayCards[idx]}
                                         onClick={() => togglePlayCard(idx)}
                                     >
@@ -150,7 +162,8 @@ const CardDrawer = ({ onApplyScore, mode = "CLASSIC" }: CardDrawerProps) => {
                                 );
                             })}
                         </div>
-                        {/* Row 2: 7–12 */}
+                        
+                        {/* Row 2 */}
                         <div className="flex justify-center gap-1 mb-1">
                             {secondRow.map((card) => {
                                 const idx = PLAY_CARDS.indexOf(card);
@@ -167,10 +180,10 @@ const CardDrawer = ({ onApplyScore, mode = "CLASSIC" }: CardDrawerProps) => {
                                 );
                             })}
                         </div>
-                        {/* Row 3: 13 (vengeance) + animated extra-13 to the right */}
+
+                        {/* Row 3 (Special 13 logic) */}
                         {isVengeance && (
                             <div className="flex justify-center mb-1">
-                                {/* Wrapper keeps base-13 centered; extra-13 grows out to the right without shifting base */}
                                 <div className="relative flex items-center">
                                     <CardButton
                                         color={PLAY_CARDS[13].color}
@@ -204,8 +217,10 @@ const CardDrawer = ({ onApplyScore, mode = "CLASSIC" }: CardDrawerProps) => {
                                 </div>
                             </div>
                         )}
+                        
                         <hr className="border-t border-gray-300 my-2" />
-                        {/* Effect cards */}
+
+                        {/* Effects */}
                         <div className="flex justify-center gap-1">
                             {EFFECT_CARDS.map((card, index) => (
                                 <CardButton
@@ -219,11 +234,13 @@ const CardDrawer = ({ onApplyScore, mode = "CLASSIC" }: CardDrawerProps) => {
                                 </CardButton>
                             ))}
                         </div>
+
                         <Button
                             onClick={handleApply}
                             disabled={total === 0 || isPending}
                             className="mt-3 mx-auto w-3/4 py-3 bg-verify text-white hover:bg-verify/90 justify-center text-lg">
-                            <Check className="h-6 w-6 mr-2" />{isPending ? "APPLYING..." : `APPLY SCORE (${total})`}
+                            <Check className="h-6 w-6 mr-2" />
+                            {isPending ? "APPLYING..." : `APPLY SCORE (${total})`}
                         </Button>
                     </Drawer.Footer>
                 </Drawer.Content>

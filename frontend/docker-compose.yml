@@ -1,0 +1,36 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - flip67
+
+  backend:
+    # Point this at your Spring Boot image or build context.
+    # Option A – pre-built image from a registry:
+    #   image: your-registry/flip67-backend:latest
+    # Option B – build from source (adjust context path):
+    #   build:
+    #     context: ../backend
+    #     dockerfile: Dockerfile
+    image: flip67-backend:latest
+    expose:
+      - "8080"
+    restart: unless-stopped
+    networks:
+      - flip67
+    # Pass any Spring Boot config here, e.g. DB connection strings:
+    # environment:
+    #   SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/flip67
+    #   SPRING_DATASOURCE_USERNAME: flip67
+    #   SPRING_DATASOURCE_PASSWORD: secret
+
+networks:
+  flip67:
+    driver: bridge

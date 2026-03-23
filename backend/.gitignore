@@ -3,6 +3,9 @@ HELP.md
 build/
 !gradle/wrapper/gradle-wrapper.jar
 
+# Secrets - never commit these
+.env
+
 ### STS ###
 .apt_generated
 .classpath
